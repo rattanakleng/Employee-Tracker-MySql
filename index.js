@@ -3,8 +3,6 @@ const inquirer = require("inquirer");
 const connection = require("./db/connection");
 
 
-
-
 //const array to do list
 // let todoList = [
 //     "Add role", "View an employee", "Add a position", "Add a department", "View deparments", "View roles", "View all employees", "Update employee role", "Update employee manager", "View employee by manager", "Delete departments", "Delete roles", "Delete employees", "View the total utilitized budget of a department", "Exit"
@@ -44,11 +42,11 @@ const start = () => {
                 return;
 
             case "View Employees":
-                viewAnEmployee();
+                viewEmployees();
                 return;
 
             case "View Roles":
-                addPosition();
+                viewRoles();
                 return;
 
             default:
@@ -57,6 +55,7 @@ const start = () => {
     })
 };
 
+// Function view departments, roles, employees
 const viewDepartments = () => {
     db
         .getDepartments()
@@ -65,6 +64,25 @@ const viewDepartments = () => {
             start()
         });
 };
+
+const viewEmployees = () => {
+    db
+        .getEmployees()
+        .then((result) => {
+            console.table(result);
+            start()
+        });
+};
+
+const viewRoles = () => {
+    db
+        .getRoles()
+        .then((result) => {
+            console.table(result);
+            start()
+        });
+};
+
 
 // // Function add departments, roles, employees
 // const addRole = () => {

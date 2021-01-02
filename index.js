@@ -1,10 +1,18 @@
+const db = require("./db");
+const inquirer = require("inquirer");
+const connection = require("./db/connection");
 
 
-// const array to do list
+
+
+//const array to do list
+// let todoList = [
+//     "Add role", "View an employee", "Add a position", "Add a department", "View deparments", "View roles", "View all employees", "Update employee role", "Update employee manager", "View employee by manager", "Delete departments", "Delete roles", "Delete employees", "View the total utilitized budget of a department", "Exit"
+// ]
+
 let todoList = [
-    "Add role", "View an employee", "Add a position", "Add a department", "View deparments", "View roles", "View all employees", "Update employee role", "Update employee manager", "View employee by manager", "Delete departments", "Delete roles", "Delete employees", "View the total utilitized budget of a department", "Exit"
+    "View Departments", "View Employees", "View Roles", "Exit"
 ]
-
 
 
 // function readColleges() {
@@ -31,63 +39,65 @@ const start = () => {
         }
     ).then(function (response) {
         switch (response.answer) {
-            case "Add role":
-                addRole();
-                break;
+            case "View Departments":
+                viewDepartments();
+                return;
 
-            case "View an employee":
+            case "View Employees":
                 viewAnEmployee();
-                break;
+                return;
 
-            case "Add a position":
+            case "View Roles":
                 addPosition();
-                break;
-
-            case "Add a department":
-                addDepartment();
-                break;
-
-            case "Exit":
-                break;
+                return;
 
             default:
-                start();
+                connection.end();
         }
     })
 };
 
-// Function add departments, roles, employees
-const addRole = () => {
-    inquirer.prompt(
-        {
-            message: "What department do you want to add?",
-            type: "input",
-            name: "deptName"
-        }
-    ).then(function (response1) {
-        connection.connect("INSERT INTO department(name) VALUE (response1.deptName)", function (err) {
-            if (err) throw err;
-            console.log(response1.deptName);
-        })
-        console.log(response1.deptName);
-        start();
-    });
+const viewDepartments = () => {
+    db
+        .getDepartments()
+        .then((result) => {
+            console.table(result);
+            start()
+        });
 };
 
-const viewAnEmployee = () => {
-    console.log("Here is employee list");
-    start();
-};
+// // Function add departments, roles, employees
+// const addRole = () => {
+//     inquirer.prompt(
+//         {
+//             message: "What department do you want to add?",
+//             type: "input",
+//             name: "deptName"
+//         }
+//     ).then(function (response1) {
+//         connection.connect("INSERT INTO department(name) VALUE (response1.deptName)", function (err) {
+//             if (err) throw err;
+//             console.log(response1.deptName);
+//         })
+//         console.log(response1.deptName);
+//         start();
+//     });
+// };
 
-const addPosition = () => {
-    console.log("Position is added");
-    start();
-};
+// const viewAnEmployee = () => {
+//     console.log("Here is employee list");
+//     start();
+// };
 
-const addDepartment = () => {
-    console.log("Department is added");
-    start();
-}
+// const addPosition = () => {
+//     console.log("Position is added");
+//     start();
+// };
+
+// const addDepartment = () => {
+//     console.log("Department is added");
+//     start();
+// }
 
 // function add department with id
 
@@ -111,4 +121,5 @@ const addDepartment = () => {
 
 // View the total utilized budget of a department -- ie the combined salaries of all employees in that department
 
+start();
 

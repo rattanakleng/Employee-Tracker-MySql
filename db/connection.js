@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const { start } = require("repl");
 const util = require("util");
 
 // create the connection information for the sql database
@@ -18,11 +19,12 @@ const connection = mysql.createConnection({
 // send request to employee_DB
 connection.connect((err) => {
     if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");   
+    console.log("connected as id " + connection.threadId + "\n");
+      
 });
 
 //use npm util and promisify enable .chain syntac
 connection.query = util.promisify(connection.query);
 
 // export mudule
-mudule.exports = connection;
+module.exports = connection;

@@ -47,7 +47,7 @@ connection.connect(function (err) {
 const start = () => {
     inquirer.prompt(
         {
-            messages: "What would you like to do?",
+            message: "What would you like to do?",
             name: "answer",
             type: "list",
             choices: todoList
@@ -81,25 +81,20 @@ const start = () => {
 
 // Function add departments, roles, employees
 const addRole = () => {
-    console.log("Role is added");
-    // connection.query("SELECT id, role FROM role", function (err, res) {
-    // if (err) throw err;
-
-    // let songOfArtist = [];
-
-    // for (let i = 0; i < res.length; i++) {
-
-    //     if (res[i].artist === response.answer) {
-
-    //         songOfArtist.push(res[i].song);
-    //     }
-    // }
-
-    // console.log(songOfArtist);
-
-    // connection.end();
-    // });
-    start();
+    inquirer.prompt(
+        {
+            message: "What department do you want to add?",
+            type: "input",
+            name: "deptName"
+        }
+    ).then(function (response1) {
+        connection.connect("INSERT INTO department(name) VALUE (response1.deptName)", function (err) {
+            if (err) throw err;
+            console.log(response1.deptName);
+        })
+        console.log(response1.deptName);
+        start();
+    });
 };
 
 const viewAnEmployee = () => {

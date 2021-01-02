@@ -1,20 +1,3 @@
-const mysql = require("mysql");
-const inquirer = require("inquirer");
-
-// create the connection information for the sql database
-const connection = mysql.createConnection({
-    host: "localhost",
-
-    // Your port; if not 3306
-    port: 3306,
-
-    // Your username
-    user: "root",
-
-    // Your password
-    password: "MySql@&2014",
-    database: "employee_db"
-});
 
 
 // const array to do list
@@ -22,13 +5,7 @@ let todoList = [
     "Add role", "View an employee", "Add a position", "Add a department", "View deparments", "View roles", "View all employees", "Update employee role", "Update employee manager", "View employee by manager", "Delete departments", "Delete roles", "Delete employees", "View the total utilitized budget of a department", "Exit"
 ]
 
-// send request to employee_DB
-connection.connect(function (err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
 
-    start();
-});
 
 // function readColleges() {
 //     connection.query("SELECT name FROM colleges", function (err, res) {

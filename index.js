@@ -1,6 +1,7 @@
 const db = require("./db");
 const inquirer = require("inquirer");
 const connection = require("./db/connection");
+const { createPromptModule } = require("inquirer");
 
 
 //const array to do list
@@ -9,7 +10,7 @@ const connection = require("./db/connection");
 // ]
 
 let todoList = [
-    "View Departments", "View Employees", "View Roles", "Exit"
+    "View Departments", "View Employees", "View Roles", "Create Role", "Exit"
 ]
 
 
@@ -49,6 +50,10 @@ const start = () => {
                 viewRoles();
                 return;
 
+            case "Create Role":
+                createRole();
+                return;
+
             default:
                 connection.end();
         }
@@ -70,7 +75,7 @@ const viewEmployees = () => {
         .getEmployees()
         .then((result) => {
             console.table(result);
-            start()
+            start();
         });
 };
 
@@ -79,10 +84,91 @@ const viewRoles = () => {
         .getRoles()
         .then((result) => {
             console.table(result);
-            start()
+            start();
         });
 };
 
+const createRole = () => {
+    db
+        .getDepartments()
+        .then((departments) => {
+
+            const departmentChoices = departments.map((department) => ({
+                value: department.id,
+                name: department.name
+            }))
+
+            inquirer
+                .prompt([
+                    {
+                        message: "What role do you want to add?",
+                        name: "roleTitle",
+                        type: "input"
+                    },
+                    {
+                        message: "What is the salary of the role",
+                        name: "salary",
+                        type: "input"
+                    },
+                    {
+                        message: "What department is this role for?",
+                        name: "departmentId",
+                        type: "list",
+                        choices: departmentChoices
+                    }
+                ]).then(res => {
+                    connection.query("INSERT INTO roles SET ?", {
+                        title: res.roleTitle,
+                        salary: res.salary,
+                        department_id: res.departmentId
+                    })
+
+                    console.log(res)
+                    start();
+                });
+        });
+};
+
+const createRole = () => {
+    db
+        .getDepartments()
+        .then((departments) => {
+
+            const departmentChoices = departments.map((department) => ({
+                value: department.id,
+                name: department.name
+            }))
+            
+            inquirer
+                .prompt([
+                    {
+                        message: "What role do you want to add?",
+                        name: "roleTitle",
+                        type: "input"
+                    },
+                    {
+                        message: "What is the salary of the role",
+                        name: "salary",
+                        type: "input"
+                    },
+                    {
+                        message: "What department is this role for?",
+                        name: "departmentId",
+                        type: "list",
+                        choices: departmentChoices
+                    }
+                ]).then(res => {
+                    connection.query("INSERT INTO roles SET ?", {
+                        title: res.roleTitle,
+                        salary: res.salary,
+                        department_id: res.departmentId
+                    })
+
+                    console.log(res)
+                    start();
+                });
+        });
+};
 
 // // Function add departments, roles, employees
 // const addRole = () => {

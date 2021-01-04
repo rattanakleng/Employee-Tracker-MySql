@@ -95,7 +95,6 @@ const addRole = () => {
                     department_id: res.departmentId
                 })
 
-                console.log(res)
                 start();
             });
         });

@@ -172,7 +172,7 @@ const viewEmployees = () => {
 
 const viewRoles = () => {
     db
-        .getDepartments()
+        .getRoles()
         .then((result) => {
             console.table(result);
             start();

@@ -3,14 +3,8 @@ const inquirer = require("inquirer");
 const connection = require("./db/connection");
 // const { createPromptModule } = require("inquirer");
 
-
-//const array to do list
-// let todoList = [
-//     "Add role", "View an employee", "Add a position", "Add a department", "View deparments", "View roles", "View all employees", "Update employee role", "Update employee manager", "View employee by manager", "Delete departments", "Delete roles", "Delete employees", "View the total utilitized budget of a department", "Exit"
-// ]
-
 let todoList = [
-    "Add Department", "Add Role", "Add Employee", "View Departments", "View Employees", "View Roles", "Update Employee Role", "Exit"
+    "Add Department", "Add Role", "Add Employee", "View Departments", "View Employees", "View Roles", "Update Employee Role", "Delete a Department", "Exit"
 ]
 
 //Init function
@@ -53,6 +47,10 @@ const start = () => {
                 viewRoles();
                 return;
 
+            case "Delete a Department":
+                deleteDepartment();
+                return;
+
             default:
                 connection.end();
         }
@@ -85,7 +83,7 @@ const addRole = () => {
                     type: "input"
                 },
                 {
-                    message: "What department is this role for?",
+                    message: "What department is this role in?",
                     name: "departmentId",
                     type: "list",
                     choices: departmentChoices
@@ -134,7 +132,7 @@ const addEmployee = () => {
                         choices: roleChoices
                     },
                     {
-                        message: "Please manger's ID, if the employee has no manager please enter 0",
+                        message: "Please enter manger's ID, if the employee has no manager please enter 0",
                         name: "managerId",
                         type: "input"
                     }
@@ -201,7 +199,7 @@ const addDepartment = () => {
 
 //Function update employee role
 const updateEmployeeRole = () => {
-    //Get roleIDs and titles
+
     db
         .getRoles()
         .then((roles) => {
@@ -244,6 +242,41 @@ const updateEmployeeRole = () => {
                             viewEmployees();
                             start();
                         })
+                })
+        })
+}
+
+//Function delete department
+const deleteDepartment = () => {
+
+    db
+        .getDepartments()
+        .then((departments) => {
+
+            const departmentChoices = departments.map((department) => ({
+                value: department.id,
+                name: department.name
+            }))
+            inquirer
+                .prompt([
+                    {
+                        message: "Which department do you want to delete?",
+                        name: "departmentName",
+                        type: "list",
+                        choices: departmentChoices
+                    },
+
+                ]).then(res => {
+
+                    connection.query("DELETE FROM departments WHERE ?",
+                        {
+                            id: res.departmentName
+                        }
+                    );
+
+                    viewDepartments();
+
+                    start();
                 })
         })
 }

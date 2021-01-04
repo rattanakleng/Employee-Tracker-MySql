@@ -1,7 +1,7 @@
 const db = require("./db");
 const inquirer = require("inquirer");
 const connection = require("./db/connection");
-const { createPromptModule } = require("inquirer");
+// const { createPromptModule } = require("inquirer");
 
 
 //const array to do list
@@ -10,24 +10,10 @@ const { createPromptModule } = require("inquirer");
 // ]
 
 let todoList = [
-    "View Departments", "View Employees", "View Roles", "Create Role", "Exit"
+    "Add Department", "Add Role", "Add Employee", "View Departments", "View Employees", "View Roles", "Update Employee Role", "Exit"
 ]
 
-
-// function readColleges() {
-//     connection.query("SELECT name FROM colleges", function (err, res) {
-//         if (err) throw err;
-
-//         // Log all results of the SELECT statement
-//         console.log(res);
-//         connection.end();
-//     });
-// }
-
-// inquerer to ask for options
-// What would you like to do? (add role, view employee, add position, add department, view deparments, view roles, view employees, update employee roles, update employee managers, view employee by manager, delete departments, delete roles, delete employees, view the total utilitized budget of a department)
-
-
+//Init function
 const start = () => {
     inquirer.prompt(
         {
@@ -38,6 +24,23 @@ const start = () => {
         }
     ).then(function (response) {
         switch (response.answer) {
+
+            case "Add Department":
+                addDepartment();
+                return;
+
+            case "Add Role":
+                addRole();
+                return;
+
+            case "Add Employee":
+                addEmployee();
+                return;
+
+            case "Update Employee Role":
+                updateEmployeeRole();
+                return;
+
             case "View Departments":
                 viewDepartments();
                 return;
@@ -50,15 +53,105 @@ const start = () => {
                 viewRoles();
                 return;
 
-            case "Create Role":
-                createRole();
-                return;
-
             default:
                 connection.end();
         }
     })
 };
+
+//Function addRole to roles table
+const addRole = () => {
+
+    //Get department IDs and names
+    db
+        .getDepartments()
+        .then((departments) => {
+
+            const departmentChoices = departments.map((department) => ({
+                value: department.id,
+                name: department.name
+            }))
+            // getDepartmentList();
+
+            inquirer.prompt([
+                {
+                    message: "What role do you want to add?",
+                    name: "roleTitle",
+                    type: "input"
+                },
+                {
+                    message: "What is the salary of the role",
+                    name: "salary",
+                    type: "input"
+                },
+                {
+                    message: "What department is this role for?",
+                    name: "departmentId",
+                    type: "list",
+                    choices: departmentChoices
+                }
+            ]).then(res => {
+                connection.query("INSERT INTO roles SET ?", {
+                    title: res.roleTitle,
+                    salary: res.salary,
+                    department_id: res.departmentId
+                })
+
+                console.log(res)
+                start();
+            });
+        });
+};
+
+//Function add employee to employees table
+const addEmployee = () => {
+
+    //Get roleIDs and titles
+    db
+        .getRoles()
+        .then((roles) => {
+            const roleChoices = roles.map((role) => ({
+                value: role.id,
+                name: role.title
+            }))
+
+            inquirer
+                .prompt([
+                    {
+                        message: "Please enter employee first name",
+                        name: "firstName",
+                        type: "input"
+                    },
+                    {
+                        message: "Please enter employee last name",
+                        name: "lastName",
+                        type: "input"
+                    },
+                    {
+                        message: "Which department is the employee in?",
+                        name: "roleId",
+                        type: "list",
+                        choices: roleChoices
+                    },
+                    {
+                        message: "Please manger's ID, if the employee has no manager please enter 0",
+                        name: "managerId",
+                        type: "input"
+                    }
+                ]).then(res => {
+                    connection.query("INSERT INTO employees SET ?", {
+                        first_name: res.firstName,
+                        last_name: res.lastName,
+                        role_id: res.roleId,
+                        manager_id: res.managerId
+                    })
+
+                    console.log(res)
+                    start();
+                });
+        });
+};
+
 
 // Function view departments, roles, employees
 const viewDepartments = () => {
@@ -81,149 +174,80 @@ const viewEmployees = () => {
 
 const viewRoles = () => {
     db
-        .getRoles()
+        .getDepartments()
         .then((result) => {
             console.table(result);
             start();
         });
 };
 
-const createRole = () => {
-    db
-        .getDepartments()
-        .then((departments) => {
+//Function addDepartment
+const addDepartment = () => {
+    inquirer
+        .prompt([
+            {
+                message: "What department do you want to add?",
+                name: "departmentName",
+                type: "input"
+            }
+        ]).then(res => {
+            connection.query("INSERT INTO departments SET ?", { name: res.departmentName })
 
-            const departmentChoices = departments.map((department) => ({
-                value: department.id,
-                name: department.name
-            }))
+            console.log(`${res.departmentName} department is added`)
 
-            inquirer
-                .prompt([
-                    {
-                        message: "What role do you want to add?",
-                        name: "roleTitle",
-                        type: "input"
-                    },
-                    {
-                        message: "What is the salary of the role",
-                        name: "salary",
-                        type: "input"
-                    },
-                    {
-                        message: "What department is this role for?",
-                        name: "departmentId",
-                        type: "list",
-                        choices: departmentChoices
-                    }
-                ]).then(res => {
-                    connection.query("INSERT INTO roles SET ?", {
-                        title: res.roleTitle,
-                        salary: res.salary,
-                        department_id: res.departmentId
-                    })
-
-                    console.log(res)
-                    start();
-                });
+            start();
         });
 };
 
-const createRole = () => {
+//Function update employee role
+const updateEmployeeRole = () => {
+    //Get roleIDs and titles
     db
-        .getDepartments()
-        .then((departments) => {
-
-            const departmentChoices = departments.map((department) => ({
-                value: department.id,
-                name: department.name
+        .getRoles()
+        .then((roles) => {
+            const roleChoices = roles.map((role) => ({
+                value: role.id,
+                name: role.title
             }))
-            
-            inquirer
-                .prompt([
-                    {
-                        message: "What role do you want to add?",
-                        name: "roleTitle",
-                        type: "input"
-                    },
-                    {
-                        message: "What is the salary of the role",
-                        name: "salary",
-                        type: "input"
-                    },
-                    {
-                        message: "What department is this role for?",
-                        name: "departmentId",
-                        type: "list",
-                        choices: departmentChoices
-                    }
-                ]).then(res => {
-                    connection.query("INSERT INTO roles SET ?", {
-                        title: res.roleTitle,
-                        salary: res.salary,
-                        department_id: res.departmentId
-                    })
+            db
+                .getEmployees()
+                .then((employees) => {
+                    const employeeNames = employees.map((employee) => ({
+                        value: employee.id,
+                        name: `${employee.first_name} ${employee.last_name}`
+                    }))
 
-                    console.log(res)
-                    start();
-                });
-        });
-};
+                    inquirer
+                        .prompt([
+                            {
+                                message: "Which employee do you want to update the role?",
+                                name: "employeeName",
+                                type: "list",
+                                choices: employeeNames
+                            },
+                            {
+                                message: "New employee's role",
+                                name: "newRole",
+                                type: "list",
+                                choices: roleChoices
+                            },
+                        ]).then(res => {
+                            connection.query("UPDATE employees SET ? WHERE ?", [
+                                {
+                                    role_id: res.newRole
+                                },
+                                {
+                                    id: res.employeeName
+                                }
+                            ])
 
-// // Function add departments, roles, employees
-// const addRole = () => {
-//     inquirer.prompt(
-//         {
-//             message: "What department do you want to add?",
-//             type: "input",
-//             name: "deptName"
-//         }
-//     ).then(function (response1) {
-//         connection.connect("INSERT INTO department(name) VALUE (response1.deptName)", function (err) {
-//             if (err) throw err;
-//             console.log(response1.deptName);
-//         })
-//         console.log(response1.deptName);
-//         start();
-//     });
-// };
+                            viewEmployees();
+                            start();
+                        })
+                })
+        })
+}
 
-// const viewAnEmployee = () => {
-//     console.log("Here is employee list");
-//     start();
-// };
-
-// const addPosition = () => {
-//     console.log("Position is added");
-//     start();
-// };
-
-// const addDepartment = () => {
-//     console.log("Department is added");
-//     start();
-// }
-
-// function add department with id
-
-// function add roles with id
-
-// function add employee last_name, first_name, link-role id, link manager id
-
-
-
-// View departments, roles, employees
-
-// Update employee roles
-
-// Bonus points if you're able to:
-
-// Update employee managers
-
-// View employees by manager
-
-// Delete departments, roles, and employees
-
-// View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
+//run init function
 start();
 

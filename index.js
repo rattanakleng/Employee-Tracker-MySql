@@ -95,7 +95,7 @@ const addRole = () => {
                     department_id: res.departmentId
                 })
 
-                start();
+                viewRoles();
             });
         });
 };
@@ -144,11 +144,28 @@ const addEmployee = () => {
                     })
 
                     console.log(res)
-                    start();
+                    viewEmployees();
                 });
         });
 };
 
+//Function addDepartment
+const addDepartment = () => {
+    inquirer
+        .prompt([
+            {
+                message: "What department do you want to add?",
+                name: "departmentName",
+                type: "input"
+            }
+        ]).then(res => {
+            connection.query("INSERT INTO departments SET ?", { name: res.departmentName })
+
+            console.log(`${res.departmentName} department is added`)
+
+            viewDepartments();
+        });
+};
 
 // Function view departments, roles, employees
 const viewDepartments = () => {
@@ -178,24 +195,6 @@ const viewRoles = () => {
         });
 };
 
-//Function addDepartment
-const addDepartment = () => {
-    inquirer
-        .prompt([
-            {
-                message: "What department do you want to add?",
-                name: "departmentName",
-                type: "input"
-            }
-        ]).then(res => {
-            connection.query("INSERT INTO departments SET ?", { name: res.departmentName })
-
-            console.log(`${res.departmentName} department is added`)
-
-            start();
-        });
-};
-
 //Function update employee role
 const updateEmployeeRole = () => {
 
@@ -206,6 +205,7 @@ const updateEmployeeRole = () => {
                 value: role.id,
                 name: role.title
             }))
+
             db
                 .getEmployees()
                 .then((employees) => {
@@ -239,7 +239,6 @@ const updateEmployeeRole = () => {
                             ])
 
                             viewEmployees();
-                            start();
                         })
                 })
         })
@@ -274,8 +273,6 @@ const deleteDepartment = () => {
                     );
 
                     viewDepartments();
-
-                    start();
                 })
         })
 }

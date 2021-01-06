@@ -9,5 +9,5 @@ module.exports = {
     },
     getEmployees() {
         return connection.query("SELECT * FROM employees");
-    },
+    }
 };

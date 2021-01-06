@@ -1,7 +1,7 @@
 const db = require("./db");
 const inquirer = require("inquirer");
 const connection = require("./db/connection");
-// const { createPromptModule } = require("inquirer");
+const { createPromptModule } = require("inquirer");
 
 let todoList = [
     "Add Department", "Add Role", "Add Employee", "View Departments", "View Employees", "View Roles", "Update Employee Role", "Delete a Department", "Exit"

@@ -1,7 +1,7 @@
 const db = require("./db");
 const inquirer = require("inquirer");
 const connection = require("./db/connection");
-const { createPromptModule } = require("inquirer");
+// const { createPromptModule } = require("inquirer");
 
 let todoList = [
     "Add Department", "Add Role", "Add Employee", "View Departments", "View Employees", "View Roles", "Update Employee Role", "Delete a Department", "Exit"
@@ -143,7 +143,6 @@ const addEmployee = () => {
                         manager_id: res.managerId
                     })
 
-                    console.log(res)
                     viewEmployees();
                 });
         });
@@ -205,7 +204,6 @@ const updateEmployeeRole = () => {
                 value: role.id,
                 name: role.title
             }))
-
             db
                 .getEmployees()
                 .then((employees) => {
@@ -246,7 +244,6 @@ const updateEmployeeRole = () => {
 
 //Function delete department
 const deleteDepartment = () => {
-
     db
         .getDepartments()
         .then((departments) => {
@@ -279,4 +276,3 @@ const deleteDepartment = () => {
 
 //run init function
 start();
-
